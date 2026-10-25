@@ -1,0 +1,54 @@
+diff --git a/slam.py b/slam.py
+index 5f6ecc3..189a9d7 100644
+--- a/slam.py
++++ b/slam.py
+@@ -40,11 +40,11 @@ class SLAM:
+             pipeline_params,
+         )
+ 
+-        self.live_mode = self.config["Dataset"]["type"] == "realsense"
++        self.live_mode = self.config["Dataset"]["type"] in ("realsense", "ros")
+         self.monocular = self.config["Dataset"]["sensor_type"] == "monocular"
+         self.use_spherical_harmonics = self.config["Training"]["spherical_harmonics"]
+         self.use_gui = self.config["Results"]["use_gui"]
+-        if self.live_mode:
++        if self.config["Dataset"]["type"] == "realsense":
+             self.use_gui = True
+         self.eval_rendering = self.config["Results"]["eval_rendering"]
+ 
+diff --git a/utils/dataset.py b/utils/dataset.py
+index 47e33f0..ce68f4f 100644
+--- a/utils/dataset.py
++++ b/utils/dataset.py
+@@ -528,5 +528,9 @@ def load_dataset(args, path, config):
+         return EurocDataset(args, path, config)
+     elif config["Dataset"]["type"] == "realsense":
+         return RealsenseDataset(args, path, config)
++    elif config["Dataset"]["type"] == "ros":
++        from utils.ros_dataset import RosDataset
++
++        return RosDataset(args, path, config)
+     else:
+         raise ValueError("Unknown dataset type")
+diff --git a/utils/slam_frontend.py b/utils/slam_frontend.py
+index 747d0f3..c0ec546 100644
+--- a/utils/slam_frontend.py
++++ b/utils/slam_frontend.py
+@@ -381,6 +381,8 @@ class FrontEnd(mp.Process):
+                 if self.reset:
+                     self.initialize(cur_frame_idx, viewpoint)
+                     self.current_window.append(cur_frame_idx)
++                    if hasattr(self.dataset, "on_pose"):
++                        self.dataset.on_pose(cur_frame_idx, viewpoint, True)
+                     cur_frame_idx += 1
+                     continue
+ 
+@@ -390,6 +392,8 @@ class FrontEnd(mp.Process):
+ 
+                 # Tracking
+                 render_pkg = self.tracking(cur_frame_idx, viewpoint)
++                if hasattr(self.dataset, "on_pose"):
++                    self.dataset.on_pose(cur_frame_idx, viewpoint, False)
+ 
+                 current_window_dict = {}
+                 current_window_dict[self.current_window[0]] = self.current_window[1:]

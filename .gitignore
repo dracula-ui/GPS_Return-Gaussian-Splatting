@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+build/
+install/
+log/
+results*/
+recordings/
+*.ply
+*.pt
+*.pth
+*.mp4
+logs/
+.px4_dir

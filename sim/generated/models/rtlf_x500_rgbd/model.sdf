@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version="1.9">
+  <model name="rtlf_x500_rgbd">
+    <include merge="true"><uri>model://x500</uri></include>
+    <link name="rgbd_link">
+      <pose relative_to="base_link">0.12 -0.0 0.1 0 0.436332 0</pose>
+      <inertial><mass>0.01</mass>
+        <inertia><ixx>1e-6</ixx><iyy>1e-6</iyy><izz>1e-6</izz></inertia></inertial>
+      <visual name="rgbd_visual"><geometry><box><size>0.02 0.06 0.02</size></box></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material></visual>
+      <sensor name="rgbd" type="rgbd_camera">
+        <camera name="rgbd">
+          <horizontal_fov>1.2</horizontal_fov>
+          <image><width>320</width><height>240</height></image>
+          <clip><near>0.2</near><far>100.0</far></clip>
+          <depth_camera><clip><near>0.2</near><far>100.0</far></clip></depth_camera>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>15</update_rate>
+        <visualize>false</visualize>
+        <topic>rtlf/rgbd</topic>
+      </sensor>
+      <sensor name="magnetometer_sensor" type="magnetometer">
+        <always_on>1</always_on><update_rate>100</update_rate><visualize>false</visualize>
+        <topic>/world/rtlf_urban/model/rtlf_x500_rgbd_0/link/base_link/sensor/magnetometer_sensor/magnetometer</topic>
+        <magnetometer>
+          <x><noise type="gaussian"><mean>0</mean><stddev>0.0002</stddev></noise></x>
+          <y><noise type="gaussian"><mean>0</mean><stddev>0.0002</stddev></noise></y>
+          <z><noise type="gaussian"><mean>0</mean><stddev>0.0002</stddev></noise></z>
+        </magnetometer>
+      </sensor>
+    </link>
+    <joint name="rgbd_joint" type="fixed"><parent>base_link</parent><child>rgbd_link</child></joint>
+  </model>
+</sdf>
